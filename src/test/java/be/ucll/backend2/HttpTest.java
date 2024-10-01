@@ -54,7 +54,8 @@ public class HttpTest {
                             "name": "Woody Harrelson"
                           }
                         ]
-                        """
+                        """,
+                        true
                 );
     }
 
@@ -70,7 +71,8 @@ public class HttpTest {
                         "id": 1,
                         "name": "Frances McDormand"
                       }
-                      """);
+                      """,
+                    true);
     }
 
     @Test
@@ -84,7 +86,8 @@ public class HttpTest {
                       {
                         "message": "Actor not found for id: 100"
                       }
-                      """);
+                      """,
+                    true);
     }
 
     @Test
@@ -159,6 +162,7 @@ public class HttpTest {
                           "id": 1,
                           "title": "Fargo",
                           "year": 1996,
+                          "director": "Joel & Ethan Coen",
                           "actors": [
                             {
                               "id": 1,
@@ -174,6 +178,7 @@ public class HttpTest {
                           "id": 2,
                           "title": "Three Billboards Outside Ebbing, Missouri",
                           "year": 2017,
+                          "director": "Martin McDonagh",
                           "actors": [
                             {
                               "id": 1,
@@ -186,7 +191,8 @@ public class HttpTest {
                           ]
                         }
                       ]
-                      """);
+                      """,
+                    true);
     }
 
     @Test
@@ -202,6 +208,7 @@ public class HttpTest {
                           "id": 2,
                           "title": "Three Billboards Outside Ebbing, Missouri",
                           "year": 2017,
+                          "director": "Martin McDonagh",
                           "actors": [
                             {
                               "id": 1,
@@ -214,7 +221,8 @@ public class HttpTest {
                           ]
                         }
                       ]
-                      """);
+                      """,
+                      true);
     }
 
     @Test
@@ -230,6 +238,7 @@ public class HttpTest {
                           "id": 1,
                           "title": "Fargo",
                           "year": 1996,
+                          "director": "Joel & Ethan Coen",
                           "actors": [
                             {
                               "id": 1,
@@ -242,7 +251,8 @@ public class HttpTest {
                           ]
                         }
                       ]
-                      """);
+                      """,
+                      true);
     }
 
     @Test
@@ -252,6 +262,6 @@ public class HttpTest {
                 .exchange()
                 .expectStatus().is2xxSuccessful()
                 .expectBody()
-                .json("[]");
+                .json("[]", true);
     }
 }
