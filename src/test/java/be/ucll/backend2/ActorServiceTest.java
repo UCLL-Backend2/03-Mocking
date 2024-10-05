@@ -1,7 +1,6 @@
 package be.ucll.backend2;
 
 import be.ucll.backend2.exception.ActorNotFoundException;
-import be.ucll.backend2.model.Actor;
 import be.ucll.backend2.repository.ActorRepository;
 import be.ucll.backend2.service.ActorService;
 import org.junit.jupiter.api.Assertions;
@@ -12,68 +11,49 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
-
+// MockitoExtension: enables @Mock en @InjectMocks
 @ExtendWith(MockitoExtension.class)
 public class ActorServiceTest {
+    // @Mock: zet mock op voor elke test
     @Mock
     private ActorRepository actorRepository;
 
+    // @InjectMocks: maak een actorService voor elke test, voorzie een mock alle argumenten
     @InjectMocks
     private ActorService actorService;
 
     @Test
     public void givenNoActorExistsWithId_whenActorIsDeleted_thenActorNotFoundExceptionIsThrown() {
-        Mockito.doReturn(false).when(actorRepository).existsById(1L);
+        // Mock existsById methode
+        Mockito.when(actorRepository.existsById(1L)).thenReturn(false);
         // of:
-        // Mockito.when(actorRepository.existsById(1L)).thenReturn(false);
+        // Mockito.doReturn(false).when(actorRepository).existsById(1L);
 
+        // Call de methode onder test (moet throwen)
         final var exception = Assertions.assertThrows(ActorNotFoundException.class, () -> actorService.deleteActor(1L));
+
+        // Check of exception klopt
         Assertions.assertEquals("Actor not found for id: 1", exception.getMessage());
     }
 
     @Test
     public void givenActorExistsWithId_whenActorIsDeleted_thenActorIsDeleted() throws ActorNotFoundException {
-        Mockito.doReturn(true).when(actorRepository).existsById(1L);
+        // Mock existsById methode
+        Mockito.when(actorRepository.existsById(1L)).thenReturn(true);
         // of:
-        // Mockito.when(actorRepository.existsById(1L)).thenReturn(true);
+        // Mockito.doReturn(true).when(actorRepository).existsById(1L);
 
+        // Call de methode onder test
         actorService.deleteActor(1L);
+
+        // Kijk na of de deleteById methode gecalld is
         Mockito.verify(actorRepository).deleteById(1L);
     }
 
-    @Test
-    public void givenActorExistsWithId_whenGetActorById_thenReturnActor() throws ActorNotFoundException {
-        final var actor = new Actor("Cillian Murphy");
-        actor.setId(1L);
-
-        // Voorbeeld zonder @Mock
-        final var actorRepository = Mockito.mock(ActorRepository.class);
-
-        Mockito.when(actorRepository.findById(1L)).thenReturn(Optional.of(actor));
-        // of:
-        // Mockito.doReturn(Optional.of(actor)).when(actorRepository).findById(1L);
-
-        // Voorbeeld zonder @InjectMocks
-        final var actorService = new ActorService(actorRepository);
-
-        final var returnedActor = actorService.getActorById(1L);
-
-        Assertions.assertEquals(actor, returnedActor);
-    }
-
-    @Test
-    public void givenActorDoesNotExistWithId_whenGetActorById_thenActorNotFoundExceptionIsThrown() {
-        // Voorbeeld zonder @Mock
-        final var actorRepository = Mockito.mock(ActorRepository.class);
-
-        Mockito.when(actorRepository.findById(1L)).thenReturn(Optional.empty());
-        // of:
-        // Mockito.doReturn(Optional.empty()).when(actorRepository).findById(1L);
-
-        // Voorbeeld zonder @InjectMocks
-        final var actorService = new ActorService(actorRepository);
-
-        Assertions.assertThrows(ActorNotFoundException.class, () -> actorService.getActorById(1L));
-    }
+    // Oefening:
+    // - Implementeer service test(s) voor getActorById
+    // - Implementeer service test(s) voor createActor
+    // - Implementeer service test(s) voor getAllActors
+    // - Implementeer service test(s) voor updateActor
+    // Let op: zorg ervoor dat elk geval getest is (happy cases en unhappy cases!)
 }
