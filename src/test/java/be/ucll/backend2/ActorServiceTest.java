@@ -1,6 +1,7 @@
 package be.ucll.backend2;
 
 import be.ucll.backend2.exception.ActorNotFoundException;
+import be.ucll.backend2.model.Actor;
 import be.ucll.backend2.repository.ActorRepository;
 import be.ucll.backend2.service.ActorService;
 import org.junit.jupiter.api.Assertions;
@@ -10,6 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
 
 // MockitoExtension: enables @Mock en @InjectMocks
 @ExtendWith(MockitoExtension.class)
@@ -50,10 +53,66 @@ public class ActorServiceTest {
         Mockito.verify(actorRepository).deleteById(1L);
     }
 
-    // Oefening:
     // - Implementeer service test(s) voor getActorById
-    // - Implementeer service test(s) voor createActor
-    // - Implementeer service test(s) voor getAllActors
+    //   - happy case: acteur bestaat
+    @Test
+    public void givenActorExistsWithId_whenGetActorByIdIsCalled_thenActorIsReturned() throws ActorNotFoundException {
+        // Given
+        final var actor = new Actor("Cillian Murphy");
+        actor.setId(1L);
+        Mockito.when(actorRepository.findById(1L)).thenReturn(Optional.of(actor));
+        // When
+        final var returnedActor = actorService.getActorById(1L);
+        // Then
+        Assertions.assertEquals(actor, returnedActor);
+    }
+
+    //   - unhappy case: acteur bestaat niet
+    @Test
+    public void givenActorDoesNotExistWithId_whenGetActorByIdIsCalled_thenActorNotFoundExceptionIsThrown() {
+        // Given
+        Mockito.when(actorRepository.findById(1L)).thenReturn(Optional.empty());
+        // When (and then)
+        final var exception = Assertions.assertThrows(ActorNotFoundException.class, () -> actorService.getActorById(1L));
+        // Then
+        Assertions.assertEquals("Actor not found for id: 1", exception.getMessage());
+    }
+
     // - Implementeer service test(s) voor updateActor
+    @Test
+    public void givenActorExistsWithId_whenUpdateActorIsCalled_thenActorIsUpdated() throws ActorNotFoundException {
+        // Given
+        final var actorInDb = new Actor("Cillian Murphy");
+        actorInDb.setId(1L);
+        Mockito.when(actorRepository.findById(1L)).thenReturn(Optional.of(actorInDb));
+        final var updatedActor = new Actor("Bill Murray");
+        updatedActor.setId(1L);
+        Mockito.when(actorRepository.save(updatedActor)).thenReturn(updatedActor);
+
+        // When
+        final var returnedActor = actorService.updateActor(1L, new Actor("Bill Murray"));
+
+        // Then
+        Assertions.assertEquals(updatedActor, returnedActor);
+        Mockito.verify(actorRepository).save(updatedActor);
+    }
+
+    // - unhappy case: acteur met id 1 bestaat niet
+    @Test
+    public void givenActorDoesNotExistWithId_whenUpdateActorIsCalled_thenActorNotFoundExceptionIsThrown() {
+        // Given
+        Mockito.when(actorRepository.findById(1L)).thenReturn(Optional.empty());
+        // When (and then)
+        final var exception = Assertions.assertThrows(
+                ActorNotFoundException.class,
+                () -> actorService.updateActor(1L, new Actor("Bill Murray")));
+        // Then
+        Assertions.assertEquals("Actor not found for id: 1", exception.getMessage());
+    }
+
+    // - Implementeer service test(s) voor createActor
+
+    // Oefening:
+    // - Implementeer service test(s) voor getAllActors
     // Let op: zorg ervoor dat elk geval getest is (happy cases en unhappy cases!)
 }
